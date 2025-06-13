@@ -1,24 +1,9 @@
 {
-  "name": "entrega3",
-  "version": "1.0.0",
-  "description": "Cookies en usuarios y registro de partidas por usuario",
-  "main": "express.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Shimumuu/entrega3.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Shimumuu/entrega3/issues"
-  },
-  "homepage": "https://github.com/Shimumuu/entrega3#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.17.0"
   }
 }

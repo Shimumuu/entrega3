@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="estilo.css">
+    <title>Crear partida</title>
+</head>
+<body>
+    <div id="Crearpartida" >     
+        <form action="/crearpartida" method="POST">
+        <!-- Campo para el nombre del jugador -->
+        <div>
+            <label for="playerName">Nombre de la partida</label>
+            <input type="text" id="nombrePartida" name="playerName" required placeholder="Ingresa el nombre de la Partida">
+        </div>
+
+        <!-- Selección del color de las piezas -->
+        <div>
+            <label for="color">Selecciona el color de las piezas</label>
+            <select id="color" name="color" required>
+                <option value="">Elige un color</option>
+                <option value="blancas">Blancas</option>
+                <option value="negras">Negras</option>
+            </select>
+        </div>
+
+        <!-- Botón para crear la partida -->
+        <button type="submit">Crear Partida</button>
+    </form></div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+    <img id="logoinicio" src="imagenes/logo.png" alt="">
+    <h1 style="color: rgb(211, 211, 211);">WELCOME!</h1>
+    <div class="login">
+        <h1>Iniciar Sesión</h1>
+        <form action="/login" method="POST">
+            <label for="email">Correo electrónico:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" name="contraseña" required>
+
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <p class="registro-link">¿No tienes cuenta? <a id="Register" href="register.html">Regístrate</a></p>
+    </div>
+
+    <div class="informacion">
+        <div class="texto">
+            <h2>¿Que somos?</h2>
+            <p>Somos una pagina centrada en el ajedrez y aportar un ambiente comodo para poder jugarlo.</p>
+            <p>Dentro de esta pagina usted podrá jugar con personas de todo el mundo, practicar, entender las reglas e
+                historia y mucho más.</p>
+        </div>
+        <img src="imagenes/ajedrez.jpg" alt="">
+    </div>
+
+</body>
+
+</html>

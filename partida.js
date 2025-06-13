@@ -292,8 +292,8 @@ function movReina(fila, columna, altPieza) {
         const x = posicionOrigen.dataset.columna
         const img = posicion?.querySelector("img")
         if (img != null) {
-            let filaTemp = posicion.dataset.fila
-            let columnaTemp = posicion.dataset.columna
+            filaTemp = posicion.dataset.fila
+            columnaTemp = posicion.dataset.columna
 
 
 
@@ -302,7 +302,7 @@ function movReina(fila, columna, altPieza) {
             if (img.alt == altPieza || img.alt != altPieza) {
                 if (img.alt == altPieza && comio < 1) {
                     //BORRAMOS LA CASILLA DONDE SE ENCUENTRA LA OTRA PIEZA DEL MISMO COLOR
-                    const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
+                    direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
                     comio++
                 }
                 if (filaTemp > y && columnaTemp > x) {
@@ -326,7 +326,8 @@ function movReina(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinalesCopia = direccionesFinales
                     }
 
                 }
@@ -334,7 +335,7 @@ function movReina(fila, columna, altPieza) {
                     // BUSCAMOS SI EXISTE EN EL ARREGLO UNA CASILLA DE LA DIAGONAL SUPERIOR IZQUIERDA
                     for (let i = 0; i < 8; i++) {
                         //proceso de cambio de la cordenada 
-                       let columnaTemp = columnaTemp.charCodeAt(0)
+                        columnaTemp = columnaTemp.charCodeAt(0)
                         columnaTemp--
                         columnaTemp = String.fromCharCode(columnaTemp)
                         filaTemp++
@@ -350,7 +351,7 @@ function movReina(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                         console.log("eliminacion segundo if" + direccionesFinales)
                     }
                 }
@@ -369,7 +370,7 @@ function movReina(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
                 else if(filaTemp < y && columnaTemp < x){
@@ -387,7 +388,7 @@ function movReina(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
                 else if (filaTemp > y) {
@@ -408,7 +409,7 @@ function movReina(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
 
                 }
@@ -429,7 +430,7 @@ function movReina(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                         console.log("eliminacion segundo if" + direccionesFinales)
                     }
                 }
@@ -447,7 +448,7 @@ function movReina(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                         const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
                 else {
@@ -464,7 +465,7 @@ function movReina(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
             }
@@ -545,7 +546,7 @@ torres.forEach(torre => {
             return;
         }
         console.log("Torre se mueve")
-        const contenedor = e.target.parentElement
+        contenedor = e.target.parentElement
         e.dataTransfer.setData("fila", contenedor.dataset.fila)// Esta linea junto a la de abajo almacena informacion sobre la posicion de la pieza se usaran en el drop, por eso es importante guardarlas
         e.dataTransfer.setData("columna", contenedor.dataset.columna)
 
@@ -602,8 +603,8 @@ function movTorre(fila, columna, altPieza) {
         const x = posicionOrigen.dataset.columna
         const img = posicion?.querySelector("img")
         if (img != null) {
-           let filaTemp = posicion.dataset.fila
-           let columnaTemp = posicion.dataset.columna
+            filaTemp = posicion.dataset.fila
+            columnaTemp = posicion.dataset.columna
 
 
 
@@ -611,7 +612,7 @@ function movTorre(fila, columna, altPieza) {
             if (img.alt == altPieza || img.alt != altPieza) {
                 if (img.alt == altPieza && comio < 1) {
                     //BORRAMOS LA CASILLA DONDE SE ENCUENTRA LA OTRA PIEZA DEL MISMO COLOR
-                    const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
+                    direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
                     comio++
                 }
 
@@ -633,7 +634,7 @@ function movTorre(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
 
                 }
@@ -654,7 +655,7 @@ function movTorre(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                         console.log("eliminacion segundo if" + direccionesFinales)
                     }
                 }
@@ -672,7 +673,7 @@ function movTorre(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
                 else {
@@ -689,7 +690,7 @@ function movTorre(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
             }
@@ -709,7 +710,7 @@ alfiles.forEach(alfil => {
             return;
         }
         console.log("Alfil se mueve")
-      const  contenedor = e.target.parentElement
+        contenedor = e.target.parentElement
         e.dataTransfer.setData("fila", contenedor.dataset.fila)// Esta linea junto a la de abajo almacena informacion sobre la posicion de la pieza se usaran en el drop, por eso es importante guardarlas
         e.dataTransfer.setData("columna", contenedor.dataset.columna)
 
@@ -765,8 +766,8 @@ function movAlfil(fila, columna, altPieza) {
         const x = posicionOrigen.dataset.columna
         const img = posicion?.querySelector("img")
         if (img != null) {
-             let filaTemp = posicion.dataset.fila
-            let columnaTemp = posicion.dataset.columna
+            filaTemp = posicion.dataset.fila
+            columnaTemp = posicion.dataset.columna
 
 
 
@@ -774,7 +775,7 @@ function movAlfil(fila, columna, altPieza) {
             if (img.alt == altPieza || img.alt != altPieza) {
                 if (img.alt == altPieza && comio < 1) {
                     //BORRAMOS LA CASILLA DONDE SE ENCUENTRA LA OTRA PIEZA DEL MISMO COLOR
-                   const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
+                    direccionesFinales = direccionesFinales.filter(casilla => casilla != "#casilla" + filaTemp + columnaTemp)
                     comio++
                 }
 
@@ -799,7 +800,8 @@ function movAlfil(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinalesCopia = direccionesFinales
                     }
 
                 }
@@ -823,7 +825,7 @@ function movAlfil(fila, columna, altPieza) {
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
                         console.log("#" + id)
-                       const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                         console.log("eliminacion segundo if" + direccionesFinales)
                     }
                 }
@@ -842,7 +844,7 @@ function movAlfil(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
                 else {
@@ -860,7 +862,7 @@ function movAlfil(fila, columna, altPieza) {
 
                         const casillaSig = document.querySelector("#casilla" + filaTemp + columnaTemp)
                         const id = casillaSig?.id
-                        const direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
+                        direccionesFinales = direccionesFinales.filter(casilla => casilla != "#" + id)
                     }
                 }
             }
@@ -930,10 +932,8 @@ casillas.forEach(casilla => {
             if (altPieza === null) { 
                 //Aquí estoy viendo si la casilla a la que quiero acceder esta vacia, de estarlo agrego la pieza
                 casilla.appendChild(pieza)  
-                movimiento.appendChild(piezaIMG);
-                movimiento.append(" se movió de " + fila + columna + " a " + destino);
-                listaMovimientos.appendChild(movimiento);
                          
+                
             } else {
                
                 if (puedeComer) {// si la casilla no esta vacia, pero puede comer una ficha, hace el intercambio
@@ -961,18 +961,23 @@ casillas.forEach(casilla => {
                     //aqui estoy viendo si la pieza comida es blanca o negra, y la agrego a su respectiva zona de piezas muertas, la animacion no se como lo hare
              if (altPiezaComida === "blanca") {
                 const destino = casilla.id.replace("casilla", "");
+                //aqui cambia el turno, por que ya se comio la pieza y este se manda para la zona de captura
+                turnos = !turnos;
+                 actualizarIndicadorTurno(); 
+                 //para verificar que funcione el if
                     
-                document.getElementById("capturadasBlancas").appendChild(piezaComida);
+                    
+                    document.getElementById("capturadasBlancas").appendChild(piezaComida);
                 movimiento.appendChild(piezaIMG);
                 movimiento.append(" se movió de " + fila + columna + " a " + destino + " y comió ");
                 movimiento.appendChild(piezaIMGComida);
                 listaMovimientos.appendChild(movimiento);
                 console.log("pieza blanca capturada")
                 } else if (altPiezaComida === "negra") {
-
                     //lo mismo pasa aqui, pero para la pieza negra
                     const destino = casilla.id.replace("casilla", "");
-
+                    turnos = !turnos;
+                 actualizarIndicadorTurno(); 
                     console.log("pieza negra capturada")     
 
                     document.getElementById("capturadasNegras").appendChild(piezaComida);
@@ -983,11 +988,15 @@ casillas.forEach(casilla => {
                 movimiento.appendChild(piezaIMGComida);
                 listaMovimientos.appendChild(movimiento);
                 }     
+                
                 }
-            //lo mismo pasa aqui, puedo mostrar de que color es la pieza que se movio y a donde se movio
 
+                casillaDestino.style.backgroundColor = ''
             }
-
+            //lo mismo pasa aqui, puedo mostrar de que color es la pieza que se movio y a donde se movio
+                movimiento.appendChild(piezaIMG);
+                movimiento.append(" se movió de " + fila + columna + " a " + destino);
+                listaMovimientos.appendChild(movimiento);
 
        //en caso de que no se come alguna pieza, este cambia el turno para poder mover la siguiente pieza del otro equipo
             turnos = !turnos;
@@ -1007,6 +1016,5 @@ casillas.forEach(casilla => {
 
     })
 })
-
 
 

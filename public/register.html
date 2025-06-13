@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+    <img id="logoinicio" src="imagenes/logo.png" alt="">
+    <div id="formulario">
+        <h1>Registrarse</h1>
+        <form action="/registrar" method="post">
+            <label for="nombre">Nombres:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="apellido">Apellidos:</label>
+            <input type="text" id="apellido" name="apellido" required>
+
+            <label for="correo">Correo electrónico:</label>
+            <input type="email" id="correo" name="correo" required>
+
+            <label for="contraseña">Contraseña</label>
+            <input type="password" id="contraseña" name="contraseña" required>
+
+            <label for="confirmar">Confirmación de contraseña</label>
+            <input type="password" id="confirmar" name="confirmar" required>
+
+            <label for="fechaNacimiento">Fecha de nacimiento</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+
+</html>
