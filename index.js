@@ -46,7 +46,7 @@ app.get('/registrar', (req, res) => {
 
 app.post('/registrar', async (req, res) => {
     //Obtenemos las variables desde el form
-    const { nombre, apellido, correo, confirmar, fechaNacimiento } = req.body;
+    const { nombre, correo, confirmar, fechaNacimiento } = req.body;
     //Esta variable debe ser let porque despues cambiara a un hash
     let { contraseña } = req.body
 
@@ -56,7 +56,6 @@ app.post('/registrar', async (req, res) => {
 
     const nuevoUsuario = {
         nombre,
-        apellido,
         correo,
         contraseña,
         fechaNacimiento
@@ -67,7 +66,7 @@ app.post('/registrar', async (req, res) => {
         res.redirect('/login');
     }
     else {
-        console.log("No se ha podido crear este usuario, nombre o correo invalido")
+        console.log("No se ha podido crear este usuario, nombre o correo invalido/ mejor dicho, ya existe un usuario con ese nombre o correo")
     }
 
 });
@@ -293,32 +292,69 @@ app.get('/cerrarSesion', (req, res) => {
     // Redirige al usuario a la página de inicio
     res.redirect('/');
 });
-app.get('ReglayHistoria', (req, res) => {
+app.get('/ReglayHistoria', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'ReglayHistoria.html'));
 });
-app.get('ReglayHistoriaV', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'ReglayHistoriaV.html'));
+app.get('/ReglayHistoriaV', cookieJwt, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ReglayHistoriaV.html'));
 });
-app.get('desarrolladores', (req, res) => {  
+app.get('/desarrolladores', (req, res) => {  
     res.sendFile(path.join(__dirname, 'public', 'desarrolladores.html'));
 });
-app.get('desarrolladoresV', (req, res) => {  
+app.get('/desarrolladoresV',cookieJwt, (req, res) => {  
     res.sendFile(path.join(__dirname, 'public', 'desarrolladoresV.html'));
+});
+app.get('/invitar', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'buscarJugador.html'));
 });
 //crear partida
 app.post('/crearpartida', cookieJwt, (req, res) => {
 const { nombrePartida, color } = req.body;
 const nuevaPartida = {
     // Creamos un objeto con los datos de la partida
-    nombre: nombrePartida,
+    nombreP: nombrePartida,
     creador: req.user.id,
-    colorCreador: color,
+    color: color,
     jugador2: null,
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
     invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
   };
-  agregarPartida(nuevaPartida);
+// Verificamos si la partida ya existe
+if (buscarPartida(nombrePartida)) {
+    console.log("Ya existe una partida con ese nombre");
+    res.redirect('/crearpartida');
+}
+else {
+      agregarPartida(nuevaPartida);
+}
 });
+async function buscarPartida(nombrePartida) {
+    try {
+        await client.connect();
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+        //Accedemos a la base de datos prueba
+        const database = client.db("Prueba");
+
+        //almacenamos en una variable la tabla partidas
+        const partidas = database.collection("partidas");
+
+        consultaPartida = await partidas.findOne({ "nombreP": nombrePartida })
+
+        if (consultaPartida) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    finally {
+        await client.close();
+        console.log("Adios dice el servidor")
+    }
+
+}
 //una funcion que agregue una partida a la base de datos
 async function agregarPartida(nuevaPartida) {
     try {
@@ -336,6 +372,7 @@ async function agregarPartida(nuevaPartida) {
 
         if (resultado) {
             console.log("Se ha subido una partida a la base de datos")
+            res.redirect('/invitar');
         }
         else {
             console.log("No se ha podido subir una partida a la base de datos")
@@ -345,6 +382,7 @@ async function agregarPartida(nuevaPartida) {
         await client.close();
     }
 }
+
 //Iniciamos el servidor
 console.log("Server start")
 
