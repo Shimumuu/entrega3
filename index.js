@@ -206,7 +206,7 @@ app.post('/login', async (req, res) => {
             });
 
             //Redireccionamos al index
-            res.redirect('/index')
+            res.redirect('/indexV')
 
         }
 
@@ -266,7 +266,7 @@ async function buscarUsuario(email) {
             const user = jwt.verify(token, 'Contraseña123'); // clave secreta
             req.user = user;
             next(); // sigue adelante si el token es válido
-        } catch (err) {
+        } catch (error) {
             // Si el token no es válido, redirigir al login y borra la cookie
             res.clearCookie("token");
             return res.redirect('/login');
@@ -285,9 +285,67 @@ app.get('/crearpartida', cookieJwt, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'crearpartida.html'));
 });
 app.get('/perfil', cookieJwt, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'perfil.html'));
+    res.sendFile(path.join(__dirname, 'public', 'perfil1.html'));
 })
+app.get('/cerrarSesion', (req, res) => {
+    // Borra la cookie de autenticación
+    res.clearCookie('token');
+    // Redirige al usuario a la página de inicio
+    res.redirect('/');
+});
+app.get('ReglayHistoria', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'ReglayHistoria.html'));
+});
+app.get('ReglayHistoriaV', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'ReglayHistoriaV.html'));
+});
+app.get('desarrolladores', (req, res) => {  
+    res.sendFile(path.join(__dirname, 'public', 'desarrolladores.html'));
+});
+app.get('desarrolladoresV', (req, res) => {  
+    res.sendFile(path.join(__dirname, 'public', 'desarrolladoresV.html'));
+});
+//crear partida
+app.post('/crearpartida', cookieJwt, (req, res) => {
+const { nombrePartida, color } = req.body;
+const nuevaPartida = {
+    // Creamos un objeto con los datos de la partida
+    nombre: nombrePartida,
+    creador: req.user.id,
+    colorCreador: color,
+    jugador2: null,
+    espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
+    invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
+  };
+  agregarPartida(nuevaPartida);
+});
+//una funcion que agregue una partida a la base de datos
+async function agregarPartida(nuevaPartida) {
+    try {
+        await client.connect();
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
+        //Accedemos a la base de datos prueba
+        const database = client.db("Prueba");
+
+        //Creamos la tabla partidas
+        const partidas = database.collection("partidas");
+
+        const resultado = await partidas.insertOne(nuevaPartida)
+
+        if (resultado) {
+            console.log("Se ha subido una partida a la base de datos")
+        }
+        else {
+            console.log("No se ha podido subir una partida a la base de datos")
+        }
+
+    } finally {
+        await client.close();
+    }
+}
+//Iniciamos el servidor
 console.log("Server start")
 
 app.listen(8080, () => {

@@ -96,6 +96,23 @@ p {
 }
 
 /* CONTENEDORES */
+.contenedorPartida {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #3d3c3c;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+.contenedorPartida label, input, select, option {
+    display: block;
+      font-weight: bold;
+      color: #52959e;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+}
 .contenedor {
     background-color: #3d3c3c;
     padding: 10px;
@@ -198,7 +215,7 @@ p {
     background-color: #33554c;
 }
 
-#estadisticas h1, #estadisticas p {
+#estadisticas h1, p {
     text-align: center;
     font-size: 40px;
 }
