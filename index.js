@@ -4,8 +4,7 @@ const bcrypt = require('bcrypt')
 const path = require('path');
 const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://cristophervasquez1:Mongodb@cluster0.eirobel.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-
+const uri = "mongodb+srv://Magdalena:magdamaki14@cluster0.uvqqml9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const app = express()
 app.use(express.json())
