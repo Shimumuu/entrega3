@@ -102,11 +102,21 @@ p {
     align-items: center;
     flex-direction: column;
     background-color: #3d3c3c;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 50px;
+    border-radius: 40px;
     margin-top: 20px;
 }
-.contenedorPartida label, input, select, option {
+.contenedorPartida h2 {
+    color: #e6e4e4;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+.contenedorPartida input, select {
+    color: #24a4a2;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+.contenedorPartida label, option{
     display: block;
       font-weight: bold;
       color: #52959e;
