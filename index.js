@@ -36,8 +36,12 @@ app.listen(8080, () =>{
 
 //Registro
 app.get('/', (req, res) => {
-    //Comando para mandar a la pagina del registro
-    res.sendFile(path.join(__dirname, 'public', 'register.html'))
+    //Comando para mandar a la pagina principal
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
+app.get('/registrar', (req, res) => {
+    //Comando para mandar a la pagina de registro
+    res.sendFile(path.join(__dirname, 'public', 'registrar.html'))
 })
 
 app.post('/registrar', async (req, res) => {
@@ -60,6 +64,7 @@ app.post('/registrar', async (req, res) => {
     if (await validaUsuario(nombre, correo)) {
         await agregarUsuario(nuevoUsuario)
         console.log("Se ha agregado el usuario de manera exitosa")
+        res.redirect('/login');
     }
     else {
         console.log("No se ha podido crear este usuario, nombre o correo invalido")
@@ -201,7 +206,7 @@ app.post('/login', async (req, res) => {
             });
 
             //Redireccionamos al index
-            res.redirect('/index.html')
+            res.redirect('/index')
 
         }
 
@@ -247,14 +252,40 @@ async function buscarUsuario(email) {
     }
 
 }
+    // verificar JWT desde la cookie
+    function cookieJwt(req, res, next) {
+        const token = req.cookies.token;
+        // Si no hay token, redirigir al login
+        if (!token) {
+            return res.redirect('/login');
+        }
+
+        try {
+            // Verificar el token
+            // Aquí se debe usar la misma clave secreta que se usó para firmar el token
+            const user = jwt.verify(token, 'Contraseña123'); // clave secreta
+            req.user = user;
+            next(); // sigue adelante si el token es válido
+        } catch (err) {
+            // Si el token no es válido, redirigir al login y borra la cookie
+            res.clearCookie("token");
+            return res.redirect('/login');
+        }
+    }
 
 
-app.get('/index', (req, res) =>{
-    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+
+app.get('/indexv', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'indexV.html'))
 })
-
-app.get('/partida', (req, res) =>{
+app.get('/partida',cookieJwt, (req, res) =>{
     res.sendFile(path.join(__dirname, 'public', 'partida.html'))
+})
+app.get('/crearpartida', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'crearpartida.html'));
+});
+app.get('/perfil', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'perfil.html'));
 })
 
 console.log("Server start")
