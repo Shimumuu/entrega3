@@ -24,10 +24,21 @@
             </ul> 
         </div>
     </nav>
-<img src="imagenes/espectadorojugador.png" alt="ImagenJuego" class="img-juego">
+    <img src="imagenes/jugador2.png" alt="ImagenJuego" class="img-jugador">
    <h1>Esperando Jugador 2</h1>
-<div class="esperando-jugador">
-    <button><a href="/invitarEspectador">Espectador</a> </button>
-    <button> <a href="/invitarJugador">Jugador</a> </button>
+<div class="contenedor-invitar">
+    <form action="/invitarE" method="POST">
+  <label>Correo del jugador a invitar como espectador:</label>
+  <input type="email" name="correoJugador" required>
+  <button type="submit">invitarEspectador</button>
+</form> 
+<form action="/invitarJ" method="POST">
+  <label>Correo del jugador a invitar como jugador 2:</label>
+  <input type="email" name="correoJugador" required>
+  <button type="submit">Invitar Jugador</button>
+</form>
+    <form action="/eliminarpartida" method="POST">
+      <button type="submit">Eliminar Partida</button>
+    </form>
 </div>
 </html>

@@ -26,12 +26,25 @@
     </nav>
     <img src="imagenes/espectador.png" alt="ImagenJuego" class="img-juego">
     <div class="contenedor-invitar">
-    <form action="/invitarE" method="POST">
-  <label>Correo del jugador a invitarcomo espectador:</label>
-  <input type="email" name="correoJugador" required>
-  <button type="submit">Enviar invitación</button>
-</form> 
-<button> <a href="/invitar">Atras</a></button>
+  <form action="/invitar" method="POST" class="formulario">
+    <label>Correo del jugador a invitar como jugador:</label><br>
+    <input type="email" name="correo" required>
+    <input type="hidden" name="rol" value="jugador">
+    <button type="submit">Invitar Jugador</button>
+  </form>
+  <br>
+
+  <form action="/invitar" method="POST" class="formulario">
+    <label>Correo del jugador a invitar como espectador:</label><br>
+    <input type="email" name="correo" required>
+    <input type="hidden" name="rol" value="espectador">
+    <button type="submit">Invitar Espectador</button>
+  </form>
+  <br>
+
+  <form action="/eliminarpartida" method="POST">
+    <button type="submit">Eliminar Partida</button>
+  </form>
     </div>
 </body>
 </html>

@@ -345,6 +345,30 @@ app.post('/invitarJugador', verificarToken, async (req, res) => {
 //crear partida
 app.post('/crearpartida', verificarToken, async (req, res) => {
 const { nombrePartida, color } = req.body;
+ try {
+        await client.connect();
+        const db = client.db("Prueba");
+        const usuarios = db.collection("usuarios");
+        const partidas = db.collection("partidas");
+
+        const usuarioId = new ObjectId(req.usuario.id);
+
+        // Verificamos si el usuario ya tiene una partida activa
+        const usuario = await usuarios.findOne({ _id: usuarioId });
+
+        if (!usuario) {
+            return res.send("Usuario no encontrado.");
+        }
+
+        if (usuario.partidaActiva) {
+            return res.send("Ya tienes una partida activa. Elimina esa antes de crear otra.");
+        }
+  const existe = await buscarPartida(nombrePartida);
+// Verificamos si la partida ya existe
+if (existe) {
+    console.log("Ya existe una partida con ese nombre");
+    res.redirect('/crearpartida');
+}
 const nuevaPartida = {
     // Creamos un objeto con los datos de la partida
     nombreP: nombrePartida,
@@ -354,69 +378,49 @@ const nuevaPartida = {
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
     invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
   };
-  const existe = await buscarPartida(nombrePartida);
-// Verificamos si la partida ya existe
-if (existe) {
-    console.log("Ya existe una partida con ese nombre");
-    res.redirect('/crearpartida');
+const agregador = await agregarPartida(nuevaPartida);
+if (agregador) {
+    // Actualizamos el usuario para que tenga la partida activa
+    await usuarios.updateOne(
+        { _id: usuarioId },
+        { $set: { partidaActiva: agregador.insertedId } }
+    );
+    console.log("Partida creada exitosamente");
+    res.redirect('/invitar');
+} else {
+    console.log("Error al crear la partida");
+    res.send("Error al crear la partida");
 }
-else {
-      agregarPartida(nuevaPartida);
-       res.redirect('/invitar');
-}
-});
+    } catch (error) {
+        console.error("Error al crear la partida:", error);
+    } finally {
+        await client.close();
+    } });
+    // buscar partida si existe
 async function buscarPartida(nombrePartida) {
     try {
         await client.connect();
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        const db = client.db("Prueba");
+        const partidas = db.collection("partidas");
 
-        //Accedemos a la base de datos prueba
-        const database = client.db("Prueba");
-
-        //almacenamos en una variable la tabla partidas
-        const partidas = database.collection("partidas");
-
-        consultaPartida = await partidas.findOne({ "nombreP": nombrePartida })
-
-        if (consultaPartida) {
-            return true
-        }
-        else {
-            return false
-        }
-    }
-    finally {
+        const partida = await partidas.findOne({ nombreP: nombrePartida });
+        return partida; // devuelve la partida o null
+    } finally {
         await client.close();
-        console.log("Adios dice el servidor")
     }
-
 }
-
-//una funcion que agregue una partida a la base de datos
+// Agregar nueva partida
 async function agregarPartida(nuevaPartida) {
     try {
         await client.connect();
+        await client.connect();
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        const db = client.db("Prueba");
+        const partidas = db.collection("partidas");
 
-        //Accedemos a la base de datos prueba
-        const database = client.db("Prueba");
-
-        //Creamos la tabla partidas
-        const partidas = database.collection("partidas");
-const usuario = await buscarUsuario(nuevaPartida.creador);
-        const resultado = await partidas.insertOne(nuevaPartida)
-
-    
-        if (resultado) {
-            console.log("Se ha subido una partida a la base de datos")
-        }
-        else {
-            console.log("No se ha podido subir una partida a la base de datos")
-            res.send("Error al crear la partida");
-        }
-
+        const resultado = await partidas.insertOne(nuevaPartida);
+        return resultado; // devuelve el resultado del insert
     } finally {
         await client.close();
     }
