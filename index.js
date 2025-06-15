@@ -3,8 +3,9 @@ const cookieparser = require("cookie-parser")
 const bcrypt = require('bcrypt')
 const path = require('path');
 const jwt = require('jsonwebtoken')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
 const uri = "mongodb+srv://Magdalena:magdamaki14@cluster0.uvqqml9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
 
 const app = express()
 app.use(express.json())
@@ -317,31 +318,6 @@ app.get('/desarrolladoresV',verificarToken, (req, res) => {
 app.get('/invitar', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'buscarJugador.html'));
 });
-app.get('/invitarEspectador', verificarToken, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'invitarEspectador.html'));
-});
-app.get('/invitarJugador', verificarToken, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'invitarJugador.html'));
-});
-
-
-app.post('/invitarJugador', verificarToken, async (req, res) => {
-    const { nombrePartida, jugador } = req.body;
-    //console.log(nombrePartida, jugador)
-    const partida = await buscarPartida(nombrePartida);
-    if (partida) {
-        // Verificamos si el jugador ya está en la partida
-        if (partida.jugador2 === null) {
-            partida.jugador2 = jugador; // Asignamos el jugador a la partida
-            await actualizarPartida(partida);
-            res.send("Jugador invitado exitosamente");
-        } else {
-            res.send("La partida ya tiene un segundo jugador");
-        }
-    } else {
-        res.send("Partida no encontrada");
-    }
-})
 //crear partida
 app.post('/crearpartida', verificarToken, async (req, res) => {
 const { nombrePartida, color } = req.body;
@@ -349,7 +325,6 @@ const { nombrePartida, color } = req.body;
         await client.connect();
         const db = client.db("Prueba");
         const usuarios = db.collection("usuarios");
-        const partidas = db.collection("partidas");
 
         const usuarioId = new ObjectId(req.usuario.id);
 
@@ -425,6 +400,95 @@ async function agregarPartida(nuevaPartida) {
         await client.close();
     }
 }
+app.post('/invitarE', verificarToken, async (req, res) => {
+    const { correoJugador } = req.body;
+    try {
+        await client.connect();
+        const db = client.db("Prueba");
+        const usuarios = db.collection("usuarios");
+        const partidas = db.collection("partidas");
+
+        const usuarioId = new ObjectId(req.usuario.id);
+
+        // Buscar al usuario que invita (creador)
+        const creador = await usuarios.findOne({ _id: usuarioId });
+        if (!creador) {
+            return res.send("Usuario no encontrado.");
+        }
+        // Verificar si el creador tiene una partida activa
+        if (!creador.partidaActiva) {
+            return res.send("No tienes una partida activa.");
+        }
+        // Buscar al espectador por correo
+        const Espectador = await usuarios.findOne({ correo: correoJugador });
+        if (!Espectador) {
+            return res.send("Espectador no encontrado.");
+        }
+        // Verificar si el espectador ya está en la partida activa del creador
+        const espectadorPartida = await partidas.findOne({ _id: new ObjectId(creador.partidaActiva), espectadores: new ObjectId(Espectador._id) });
+        if (espectadorPartida) {
+            return res.send("El espectador ya está en una partida activa.");
+        }
+        // Agregar al espectador a la partida
+        const partida = await partidas.findOne({ _id: new ObjectId(creador.partidaActiva) });
+        if (!partida) {
+            return res.send("Partida no encontrada.");
+        }
+            partida.espectadores.push(Espectador._id); // Agregar el ID del espectador al array de espectadores
+            await partidas.updateOne({ _id: new ObjectId(creador.partidaActiva) }, { $set: { espectadores: partida.espectadores } });
+            console.log("Espectador agregado exitosamente");
+            res.send("Espectador invitado exitosamente");
+        
+    } catch (error) {
+        console.error("Error al invitar al espectador:", error);
+        res.status(500).send("Error al invitar al espectador");
+    } finally {
+        await client.close();
+    }
+});
+app.post('/invitarJ', verificarToken, async(req, res) => {
+    const { correoJugador } = req.body;
+try {
+    await client.connect();
+    const db = client.db("Prueba");
+    const usuarios = db.collection("usuarios");
+    const partidas = db.collection("partidas");
+
+    const usuarioId = new ObjectId(req.usuario.id);
+        // Buscar al usuario que invita
+        const creador = await usuarios.findOne({ _id: usuarioId });
+    // Buscar al usuario que invita
+        if (!creador) {
+            return res.send("Usuario no encontrado.");
+        }
+
+        // Verificar si el creador tiene una partida activa
+        if (!creador.partidaActiva) {
+            return res.send("No tienes una partida activa.");
+        }
+
+        // Buscar al jugador por correo
+        const jugador = await usuarios.findOne({ correo: correoJugador });
+        if (!jugador) {
+            return res.send("Jugador no encontrado.");
+        }
+       const partida = await partidas.findOne({ _id: new ObjectId(creador.partidaActiva) });
+        if (!partida) {
+            return res.send("Partida no encontrada.");
+        } else if (partida.jugador2) {
+            return res.send("Ya hay un jugador en la partida.");
+        }
+        // Agregar al jugador a la partida
+        partida.jugador2 = jugador._id; // Asignar el ID del jugador
+        await partidas.updateOne({ _id: new ObjectId(creador.partidaActiva) }, { $set: { jugador2: partida.jugador2 } });
+        console.log("Jugador agregado exitosamente");
+        res.send("Jugador invitado exitosamente");
+} catch (error) {
+    console.error("Error al invitar al jugador:", error);
+    res.status(500).send("Error al invitar al jugador");
+} finally {
+    await client.close();
+}});
 
 //Iniciamos el servidor
 console.log("Server start")
