@@ -202,6 +202,8 @@ app.post('/login', async (req, res) => {
             res.cookie('token', token, {
                 //La hacemos httpOnly para que no se acceda desde js
                 httpOnly: true,
+                //aqui se coloca el secure para que la cookie solo se envie por https
+                secure: false, // Cambiar a true si se usa HTTPS 
             });
 
             //Redireccionamos al index
@@ -222,7 +224,6 @@ app.post('/login', async (req, res) => {
 
 //Funcion para buscar al usuario en la base de dato y retornarlo
 async function buscarUsuario(email) {
-    let contraseñaUsuario
     try {
         await client.connect();
         await client.db("admin").command({ ping: 1 });
@@ -307,6 +308,13 @@ app.get('/desarrolladoresV',cookieJwt, (req, res) => {
 app.get('/invitar', cookieJwt, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'buscarJugador.html'));
 });
+app.get('/invitarEspectador', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'invitarEspectador.html'));
+});
+app.get('/invitarJugador', cookieJwt, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'invitarJugador.html'));
+});
+
 //crear partida
 app.post('/crearpartida', cookieJwt, (req, res) => {
 const { nombrePartida, color } = req.body;
@@ -319,8 +327,9 @@ const nuevaPartida = {
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
     invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
   };
+  const existe = buscarPartida(nombrePartida);
 // Verificamos si la partida ya existe
-if (buscarPartida(nombrePartida)) {
+if (existe) {
     console.log("Ya existe una partida con ese nombre");
     res.redirect('/crearpartida');
 }
@@ -355,6 +364,7 @@ async function buscarPartida(nombrePartida) {
     }
 
 }
+
 //una funcion que agregue una partida a la base de datos
 async function agregarPartida(nuevaPartida) {
     try {
@@ -370,19 +380,26 @@ async function agregarPartida(nuevaPartida) {
 
         const resultado = await partidas.insertOne(nuevaPartida)
 
+    
         if (resultado) {
             console.log("Se ha subido una partida a la base de datos")
-            res.redirect('/invitar');
+            return res.redirect('/invitar');
         }
         else {
             console.log("No se ha podido subir una partida a la base de datos")
+             return res.send("Error al crear la partida");
         }
 
     } finally {
         await client.close();
     }
 }
+app.post('/invitarJugador', cookieJwt, (req, res) => {
 
+});
+function enviarInvitacion(nombrePartida, jugador) {
+ 
+}
 //Iniciamos el servidor
 console.log("Server start")
 

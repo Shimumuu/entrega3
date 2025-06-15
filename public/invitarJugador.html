@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="estilo.css">
+        <link rel="stylesheet" href="estilo.css">
     <link rel="icon" href="imagenes/logo.png" type="image/png">
-    <title>Esperando jugador</title>
+    <title>Invitar jugador</title>
 </head>
 <body>
           <nav id="navegador">
@@ -24,10 +25,15 @@
             </ul> 
         </div>
     </nav>
-<img src="imagenes/espectadorojugador.png" alt="ImagenJuego" class="img-juego">
-   <h1>Esperando Jugador 2</h1>
-<div class="esperando-jugador">
-    <button><a href="/invitarEspectador">Espectador</a> </button>
-    <button> <a href="/invitarJugador">Jugador</a> </button>
-</div>
+    <img src="imagenes/jugador2.png" alt="ImagenJuego" class="img-jugador">
+    <div class="contenedor-invitar">
+        <form action="/invitarJ" method="POST">
+  <label>Correo del jugador a invitar:</label>
+  <input type="email" name="correoJugador" required>
+  <button type="submit">Enviar invitación</button>
+</form>
+<button> <a href="/invitar">Atras</a></button>
+    </div>
+
+</body>
 </html>

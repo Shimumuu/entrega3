@@ -32,7 +32,10 @@ p {
     font-size: 20px;
     font-weight: 400;
 }
-
+a {
+    color:#e8e7e7;
+    text-decoration: none;
+}
 
 /* NAV */
 #navegador {
@@ -56,7 +59,6 @@ p {
 
 #navegador a {
     color: white;
-    text-decoration: none;
     margin: 0 15px;
 }
 
@@ -310,6 +312,7 @@ p {
 }
 
 button {
+    margin: 5px;
     padding: 4px 8px;
 }
 
@@ -635,6 +638,7 @@ button:hover, .boton-crear:hover {
     font-size: 17px;
     color: #acaaaa;
 }
+/* CREAR PARTIDA */
 .crear-partida{
     background-color: #363636;
     color: #cfc3c3;
@@ -661,3 +665,41 @@ button:hover, .boton-crear:hover {
     display: block;
 }
 
+/* invitar partida */
+.contenedor-invitar {
+    background-color: #363636;
+    color: #cfc3c3;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    margin: 20px auto;
+}
+.contenedor-invitar button {
+margin-top: 15px;
+}
+.esperando-jugador {
+    background-color: #363636;
+    color: #cfc3c3;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    margin: 20px auto;
+}
+.img-jugador {
+    margin-top: 20px;
+    align-items: center;
+    max-width: 500px;
+    border-radius: 10px;
+    margin-left: 40px;
+
+}
+.img-juego {
+    margin-top: 20px;
+    align-items: center;
+    width: 40%;
+    max-width: 300px;
+    border-radius: 10px;
+    margin-left: 40px;
+}
