@@ -34,7 +34,7 @@ app.listen(8080, () =>{
 */
 
 
-//Registro
+//index
 app.get('/', (req, res) => {
     //Comando para mandar a la pagina principal
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
@@ -58,7 +58,9 @@ app.post('/registrar', async (req, res) => {
         nombre,
         correo,
         contraseña,
-        fechaNacimiento
+        fechaNacimiento,
+        partidas: [], // Inicializamos un array para las partidas del usuario
+        partidaActiva: null // Inicializamos la partida activa como null
     };
     if (await validaUsuario(nombre, correo)) {
         await agregarUsuario(nuevoUsuario)
@@ -253,38 +255,45 @@ async function buscarUsuario(email) {
 
 }
     // verificar JWT desde la cookie
-    function cookieJwt(req, res, next) {
-        const token = req.cookies.token;
-        // Si no hay token, redirigir al login
-        if (!token) {
-            return res.redirect('/login');
-        }
+//Funcion para verificar que el token es correctoAdd commentMore actions
+function verificarToken(req, res, next) {
 
-        try {
-            // Verificar el token
-            // Aquí se debe usar la misma clave secreta que se usó para firmar el token
-            const user = jwt.verify(token, 'Contraseña123'); // clave secreta
-            req.user = user;
-            next(); // sigue adelante si el token es válido
-        } catch (error) {
-            // Si el token no es válido, redirigir al login y borra la cookie
-            res.clearCookie("token");
-            return res.redirect('/login');
-        }
+    //Obtenemos la cookie HTTPonly de jwt
+    const token = req.cookies.token
+
+    //Si el token no existe, redirecciona al login
+    if (!token) {
+        console.log("No puedes ingresar aquí")
+        return res.redirect('/login')
     }
 
+    try {
+        //Usamos la funcion verify para decodificar los datos con la firma, en este caso harcodeada
+        const usuario = jwt.verify(token, 'Contraseña123')
+
+        //Guardamos el nombre de usuario para que se pueda usar en otras paginas
+        req.usuario = usuario;
+        next(); // seguimos a la siguiente función
+
+    //Si hay algun error borrara el toke, y redirige al login
+    } catch (err) {
+        console.log("Token inválido")
+        res.clearCookie('token')
+        return res.redirect('/login')
+    }
+}
 
 
-app.get('/indexv', cookieJwt, (req, res) => {
+app.get('/indexv', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'indexV.html'))
 })
-app.get('/partida',cookieJwt, (req, res) =>{
+app.get('/partida',verificarToken, (req, res) =>{
     res.sendFile(path.join(__dirname, 'public', 'partida.html'))
 })
-app.get('/crearpartida', cookieJwt, (req, res) => {
+app.get('/crearpartida', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'crearpartida.html'));
 });
-app.get('/perfil', cookieJwt, (req, res) => {
+app.get('/perfil', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'perfil1.html'));
 })
 app.get('/cerrarSesion', (req, res) => {
@@ -296,27 +305,45 @@ app.get('/cerrarSesion', (req, res) => {
 app.get('/ReglayHistoria', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'ReglayHistoria.html'));
 });
-app.get('/ReglayHistoriaV', cookieJwt, (req, res) => {
+app.get('/ReglayHistoriaV', verificarToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'ReglayHistoriaV.html'));
 });
 app.get('/desarrolladores', (req, res) => {  
     res.sendFile(path.join(__dirname, 'public', 'desarrolladores.html'));
 });
-app.get('/desarrolladoresV',cookieJwt, (req, res) => {  
+app.get('/desarrolladoresV',verificarToken, (req, res) => {  
     res.sendFile(path.join(__dirname, 'public', 'desarrolladoresV.html'));
 });
-app.get('/invitar', cookieJwt, (req, res) => {
+app.get('/invitar', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'buscarJugador.html'));
 });
-app.get('/invitarEspectador', cookieJwt, (req, res) => {
+app.get('/invitarEspectador', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'invitarEspectador.html'));
 });
-app.get('/invitarJugador', cookieJwt, (req, res) => {
+app.get('/invitarJugador', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'invitarJugador.html'));
 });
 
+
+app.post('/invitarJugador', verificarToken, async (req, res) => {
+    const { nombrePartida, jugador } = req.body;
+    //console.log(nombrePartida, jugador)
+    const partida = await buscarPartida(nombrePartida);
+    if (partida) {
+        // Verificamos si el jugador ya está en la partida
+        if (partida.jugador2 === null) {
+            partida.jugador2 = jugador; // Asignamos el jugador a la partida
+            await actualizarPartida(partida);
+            res.send("Jugador invitado exitosamente");
+        } else {
+            res.send("La partida ya tiene un segundo jugador");
+        }
+    } else {
+        res.send("Partida no encontrada");
+    }
+})
 //crear partida
-app.post('/crearpartida', cookieJwt, (req, res) => {
+app.post('/crearpartida', verificarToken, async (req, res) => {
 const { nombrePartida, color } = req.body;
 const nuevaPartida = {
     // Creamos un objeto con los datos de la partida
@@ -327,7 +354,7 @@ const nuevaPartida = {
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
     invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
   };
-  const existe = buscarPartida(nombrePartida);
+  const existe = await buscarPartida(nombrePartida);
 // Verificamos si la partida ya existe
 if (existe) {
     console.log("Ya existe una partida con ese nombre");
@@ -335,6 +362,7 @@ if (existe) {
 }
 else {
       agregarPartida(nuevaPartida);
+       res.redirect('/invitar');
 }
 });
 async function buscarPartida(nombrePartida) {
@@ -377,29 +405,23 @@ async function agregarPartida(nuevaPartida) {
 
         //Creamos la tabla partidas
         const partidas = database.collection("partidas");
-
+const usuario = await buscarUsuario(nuevaPartida.creador);
         const resultado = await partidas.insertOne(nuevaPartida)
 
     
         if (resultado) {
             console.log("Se ha subido una partida a la base de datos")
-            return res.redirect('/invitar');
         }
         else {
             console.log("No se ha podido subir una partida a la base de datos")
-             return res.send("Error al crear la partida");
+            res.send("Error al crear la partida");
         }
 
     } finally {
         await client.close();
     }
 }
-app.post('/invitarJugador', cookieJwt, (req, res) => {
 
-});
-function enviarInvitacion(nombrePartida, jugador) {
- 
-}
 //Iniciamos el servidor
 console.log("Server start")
 
