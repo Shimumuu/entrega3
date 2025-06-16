@@ -221,10 +221,6 @@ app.post('/login', async (req, res) => {
 
 })
 
-
-
-
-
 //Funcion para buscar al usuario en la base de dato y retornarlo
 async function buscarUsuario(email) {
     try {
@@ -347,6 +343,7 @@ const nuevaPartida = {
     creador: req.user.id,
     color: color,
     jugador2: null,
+    color2: null, // Asignamos el color del segundo jugador
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
     invitaciones: [],
     EspectadorSI:[] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
@@ -470,11 +467,18 @@ try {
         if (!jugador) {
             return res.send("Jugador no encontrado.");
         }
+        let colorJugador2;
+
        const partida = await partidas.findOne({ _id: new ObjectId(creador.partidaActiva) });
+       if (partida.color === 'blanco') {
+    colorJugador2 = 'negro';
+} else {
+    colorJugador2 = 'blanco';
+}
        if (partida.jugador2) {
   // Ya hay un jugador, agregar como espectador
      partida.espectadores.push(jugador._id);
-    await partidas.updateOne({ _id: new ObjectId(creador.partidaActiva) }, { $set: { espectadores: partida.espectadores } });
+    await partidas.updateOne({ _id: new ObjectId(creador.partidaActiva), color2: colorJugador2 }, { $set: { espectadores: partida.espectadores } });
     return res.send("Ya hay un jugador en la partida. El invitado fue agregado como espectador.");
         }
         if (!partida) {
@@ -493,6 +497,7 @@ try {
 } finally {
     await client.close();
 }});
+// Acceder a las partidas del usuario
 
 app.get('/accederPartida', verificarToken, async (req, res) => {
     try {
@@ -566,9 +571,109 @@ app.post('/eliminarPartida', verificarToken, async (req, res) => {
         await client.close();
     }
 });
+// Aceptar invitación a partida
+app.post('/aceptarInvitacion', verificarToken, async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db("Prueba");
+        const usuarios = db.collection("usuarios");
+        const partidas = db.collection("partidas");
 
+        // Obtener el ID del usuario desde el token
+        const usuarioId = new ObjectId(req.usuario.id);
+
+        // Buscar al usuario por su ID
+        const usuario = await usuarios.findOne({ _id: usuarioId });
+        if (!usuario) {
+            return res.send("Usuario no encontrado.");
+        }
+
+        // Verificar si el usuario tiene una invitación pendiente
+        const invitacion = await partidas.findOne({ 
+            $or: [
+                { invitaciones: usuarioId },
+                { espectadores: usuarioId }
+            ]
+        });
+
+        if (!invitacion) {
+            return res.send("No tienes invitaciones pendientes.");
+        }
+
+        // Aceptar la invitación y agregar al usuario a la partida
+        await partidas.updateOne(
+            { _id: invitacion._id },
+            { $addToSet: { jugadores: usuarioId } } // Agregar al jugador a la partida
+        );
+
+        console.log("Invitación aceptada exitosamente");
+        res.send("Invitación aceptada exitosamente");
+    } catch (error) {
+        console.error("Error al aceptar la invitación:", error);
+        res.status(500).send("Error al aceptar la invitación");
+    } finally {
+        await client.close();
+    }
+} );
+
+// Listar invitaciones de jugadores y espectadores
 app.post('/listainvitados', verificarToken, async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db("Prueba");
+    const partidas = db.collection("partidas");
+    const usuarioId = new ObjectId(req.usuario.id);
 
+    const invitaciones = await partidas.find({
+      $or: [
+        { invitaciones: usuarioId },
+        { espectadores: usuarioId }
+      ]
+    }).toArray();
+
+    const resultado = [];
+
+    invitaciones.forEach(partida => {
+      let tipoInvitacion = ' ';
+let invitadoJugador = false;
+for (let i = 0; i < partida.invitaciones.length; i++) {
+  if (partida.invitaciones[i].equals(usuarioId)) {
+    invitadoJugador = true;
+    break;
+  }
+}
+      // Revisamos si el usuario está invitado como jugador
+      if (invitadoJugador) {
+        tipoInvitacion = 'jugador';
+      }
+      //comprobamos si es invitado como espectador
+let invitadoEspectador= false;
+for (let i = 0; i < partida.espectadores.length; i++) {
+  if (partida.espectadores[i].equals(usuarioId)) {
+    invitadoEspectador = true;
+    break;
+  }
+}
+      // Revisamos si el usuario está invitado como espectador
+      if (invitadoEspectador) {
+        tipoInvitacion = 'espectador';
+      }
+
+      resultado.push({
+        _id: partida._id,
+        nombreP: partida.nombreP,
+        tipo: tipoInvitacion
+      });
+    });
+
+    res.json(resultado);
+
+  } catch (error) {
+    console.error("Error al obtener invitaciones:", error);
+    res.status(500).send("Error al obtener invitaciones");
+  } finally {
+    await client.close();
+  }
 });
 //Iniciamos el servidor
 console.log("Server start")
