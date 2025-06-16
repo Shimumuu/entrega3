@@ -288,9 +288,6 @@ function verificarToken(req, res, next) {
 app.get('/indexv', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'indexV.html'))
 })
-app.get('/partida',verificarToken, (req, res) =>{
-    res.sendFile(path.join(__dirname, 'public', 'partida.html'))
-})
 app.get('/crearpartida', verificarToken, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'crearpartida.html'));
 });
@@ -351,7 +348,8 @@ const nuevaPartida = {
     color: color,
     jugador2: null,
     espectadores: [], //lo unico que se me ocurre es que los espectadores sean un array
-    invitaciones: [] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
+    invitaciones: [],
+    EspectadorSI:[] //tengo que ver la manera de que los jugadores puedan invitar a otros jugadores y que si hay alun jugadorm que las invitaciones restantes se transformen en espectadores
   };
 const agregador = await agregarPartida(nuevaPartida);
 if (agregador) {
@@ -473,6 +471,12 @@ try {
             return res.send("Jugador no encontrado.");
         }
        const partida = await partidas.findOne({ _id: new ObjectId(creador.partidaActiva) });
+       if (partida.jugador2) {
+  // Ya hay un jugador, agregar como espectador
+     partida.espectadores.push(jugador._id);
+    await partidas.updateOne({ _id: new ObjectId(creador.partidaActiva) }, { $set: { espectadores: partida.espectadores } });
+    return res.send("Ya hay un jugador en la partida. El invitado fue agregado como espectador.");
+        }
         if (!partida) {
             return res.send("Partida no encontrada.");
         } else if (partida.jugador2) {
@@ -490,6 +494,82 @@ try {
     await client.close();
 }});
 
+app.get('/accederPartida', verificarToken, async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db("Prueba");
+        const usuarios = db.collection("usuarios");
+        const partidas = db.collection("partidas");
+        // Obtener el ID del usuario desde el token
+        const usuarioId = new ObjectId(req.usuario.id);
+
+        // Buscar al usuario por su ID
+        const usuario = await usuarios.findOne({ _id: usuarioId });
+        if (!usuario) {
+            return res.send("Usuario no encontrado.");
+        }
+
+const resultado = await partidas.find({
+            $or: [
+                { creador: usuarioId },
+                { jugador2: usuarioId },
+            ]
+        }).toArray();
+        res.json(resultado); // Enviar las partidas encontradas como respuesta
+    } catch (error) {
+        console.error("Error al acceder a la partida:", error);
+        res.status(500).send("Error al acceder a la partida");
+    } finally {
+        await client.close();
+    }
+});
+app.post('/eliminarPartida', verificarToken, async (req, res) => {
+    try {
+        await client.connect();
+        const db = client.db("Prueba");
+        const usuarios = db.collection("usuarios");
+        const partidas = db.collection("partidas");
+
+        // Obtener el ID del usuario desde el token
+        const usuarioId = new ObjectId(req.usuario.id);
+
+        // Buscar al usuario por su ID
+        const usuario = await usuarios.findOne({ _id: usuarioId });
+        if (!usuario) {
+            return res.send("Usuario no encontrado.");
+        }
+
+        // Verificar si el usuario tiene una partida activa
+        if (!usuario.partidaActiva) {
+            return res.send("No tienes una partida activa.");
+        }
+                // Verificar si el usuario es el creador de la partida
+        const partida = await partidas.findOne({ _id: new ObjectId(usuario.partidaActiva    ) });
+        if (!partida) {
+            return res.send("Partida no encontrada.");
+        }
+        if (partida.creador !== req.usuario.id) {
+            return res.send("No tienes permiso para eliminar esta partida.");
+        }
+        // Eliminar la partida activa del usuario
+        await partidas.deleteOne({ _id: new ObjectId(usuario.partidaActiva) });
+
+        // Actualizar el usuario para eliminar la referencia a la partida activa
+        await usuarios.updateOne({ _id: usuarioId }, { $set: { partidaActiva: null } });
+
+        console.log("Partida eliminada exitosamente");
+        res.send("Partida eliminada exitosamente");
+    } catch (error) {
+        console.error("Error al eliminar la partida:", error);
+        res.status(500).send("Error al eliminar la partida");
+    } finally {
+        await client.close();
+    }
+});
+
+app.post('/listainvitados', verificarToken, async (req, res) => {
+
+});
 //Iniciamos el servidor
 console.log("Server start")
 

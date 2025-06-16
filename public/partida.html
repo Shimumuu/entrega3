@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Pagina de juego</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="estilo.css">
         <link rel="icon" href="imagenes/logo.png" type="image/png">
 </head>
@@ -62,6 +63,32 @@ anterior si es que existe)
                 <!--Implementar un botón de “rendirse” que permita a un jugador
 rendirse y finalizar la partida (tengo que crear un funcionamiento a este boton)-->
                 <button id="boton-rendirse">Rendirse</button>
+                <form action="/eliminarPartida" method="POST">
+  <!-- Botón que activa el modal -->
+  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarEliminarModal">
+    Eliminar Partida
+  </button>
+
+  <!-- Modal de confirmación -->
+  <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">¿Estás seguro?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          Esta acción eliminará tu partida activa. ¿Deseas continuar?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <!-- Este es el botón que envía el formulario -->
+          <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
             </div>
         </div>
         <!--Implementar una bandeja de piezas capturadas para cada
@@ -199,5 +226,6 @@ jugador (crear otro panel para poder agregarlo)-->
         <!--donde termina el panel lateral-->
 </div>
 <script src="js/partida.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
